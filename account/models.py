@@ -9,7 +9,7 @@ class Userable(AbstractUser):
         ('선택', None), ('구직자', 'Applicant'), ('구인자', 'Employer')
     ]
     type = models.CharField(max_length=3, choices=CHOICES)
-    interest = models.ManyToManyField('util.Interest', related_name='interests')
+    interest = models.ManyToManyField('util.Interest', related_name='interests',blank = True, null =True)
 
 class Applicant(Userable):
     nickname = models.CharField(max_length=16, unique=True, null=False, default='')

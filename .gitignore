@@ -2,7 +2,6 @@
 /shelf/
 /workspace.xml
 venv/
-*/migrations
 db.sqlite3
 *.pyc
 .idea/
