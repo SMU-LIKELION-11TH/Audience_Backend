@@ -1,69 +1,73 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Comment, Reply
-from .forms import CommentForm, ReplyForm
+from employ.models import Postable
 import json
+from django.http import JsonResponse
 
 @login_required
-def create_comment(request, post_id): # 댓글 생성(ajax)
+def create_comment(request): # 댓글 생성(ajax)
     if request.method == 'POST':
+        user = request.user
         data = json.loads(request.body)
-        filed_form = data['filed_form']
-        temp_form = data['temp_form']
-        filed_form = CommentForm(request.POST)
-        if filed_form.is_vaild():
-            temp_form = filed_form.save(commit=False)
-            temp_form.post = Post.objects.get(id = post_id)
-            temp_form.save()
-        print(data)
+        post = Postable.objects.get(id = data['post_id'])
+        content = data['content']
 
-        context = {
-            'result': data
-        }
-        return JsonResponse(context)
-        # return redirect('detail',post_id) ?????
+        Comment.objects.create(content = content, postable = post, userable = request.user)
+
+        return JsonResponse({})
+
 @login_required
-def delete_comment(comment_id,post_id): # 댓글 삭제(ajax)
+def update_comment(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        my_comment = data['my_comment']
-        my_comment = Comment.objects.get(id = comment_id)
-        my_comment.delete()
+        comment = Comment.objects.get(id = data['comment_id'])
+        content = data['content']
 
-        print(data)
+        comment.content = content
+        comment.save()
 
-        context = {
-            'result': data
-        }
-        return JsonResponse(context)
-        # return redirect('detail', post_id)
+        return JsonResponse({})
+
 @login_required
-def create_reply(request,post_id):# 대댓글 쓰기(ajax)
+def delete_comment(request): # 댓글 삭제(ajax)
     if request.method == 'POST':
         data = json.loads(request.body)
-        form = data['form ']
+        comment = Comment.objects.get(id = data['comment_id'])
+        comment.delete()
 
-        form = ReplyForm(request.POST)
-        if form.is_valid():
-            form.save()
-            print(data)
+        return JsonResponse({})
 
-            context = {
-                'result': data
-            }
-            return JsonResponse(context)
-    # return redirect('detail',post_id)
 @login_required
-def delete_reply(reply_id, post_id): # 대댓글 삭제(ajax)
+def create_reply(request):# 대댓글 쓰기(ajax)
     if request.method == 'POST':
         data = json.loads(request.body)
-        my_reply =data['my_reply']
-        my_reply = Reply.objects.get(id=reply_id)
-        my_reply.delete()
-        print(data)
+        content = data['content']
+        comment = Comment.objects.get(id = data["comment_id"])
+        user = request.user
 
-        context = {
-            'result': data
-        }
-        return JsonResponse(context)
-        # return redirect('detail', post_id)
+        Reply.objects.create(content = content, comment = comment, userable = user)
+
+        return JsonResponse({})
+
+@login_required
+def update_reply(request):# 대댓글 쓰기(ajax)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        content = data['content']
+        reply = Reply.objects.get(id = data['reply_id'])
+
+        reply.content = content
+        reply.save()
+
+        return JsonResponse({})
+
+@login_required
+def delete_reply(request): # 대댓글 삭제(ajax)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        reply = Reply.objects.get(id = data['reply_id'])
+        reply.delete()
+
+        return JsonResponse({})
+
