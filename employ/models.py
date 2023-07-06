@@ -16,8 +16,8 @@ class Employ_post(Postable):
     CAREER_CHOICES = (('a', '경력'), ('b', '신입'))
     career = models.CharField(max_length=1, default='a', choices=CAREER_CHOICES)
     EMPLOY_SHAPE_CHOICES = (('a','인턴'),('b','정규직'),('c','비정규직'))
-    employ_shape =  models.CharField(max_length=1, default='a', choices=EMPLOY_SHAPE_CHOICES )
-    apply_method = forms.CharField(max_length=50)
+    employ_shape = models.CharField(max_length=1, default='a', choices=EMPLOY_SHAPE_CHOICES )
+    apply_method = models.CharField(max_length=50)
 
 class Freepost_e (Postable,models.Model):
     pass
