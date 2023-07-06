@@ -115,4 +115,5 @@ def search_posts(request):
             elif search_type == "회사":
                 posts = Freepost.objects.filter(company__incontain=keyword)
 
-    return JsonResponse({'posts': posts})
+    return JsonResponse({'posts': posts, 'category': category, 'board_type': board_type,
+                         'post_type': post_type, 'search_type': search_type, 'keyword': keyword})
