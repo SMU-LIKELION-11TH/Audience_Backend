@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse, reverse_lazy #리버스 오류나면 리버스레이지로
 from django.http import JsonResponse
 
 from .models import Like, Dislike, Interest, Hashtag
@@ -34,7 +35,7 @@ def add_like(request, post_id):
     return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
                          'is_liked': True, 'is_disliked': False})
 
-# 싫어요 tested
+
 def add_dislike(request, post_id):
     user = request.user
     post = Postable.objects.get(id=post_id)
@@ -102,9 +103,11 @@ def update_interest(request):
         error_message = "하나 이상 선택하세요"
         return render(request, 'error.html', {'error_message': error_message})
 
+
 # 해시태그 생성(게시물 id)
 def add_hashtag(request, post_id):
     post = Postable.objects.get(id=post_id)
+
     # 기존 해시태그 삭제
     Hashtag.objects.filter(postable=post_id).delete()
     hashtag_list = request.POST.getlist('hashtags')
@@ -116,3 +119,4 @@ def add_hashtag(request, post_id):
         hashtag.postable.add(post)
 
     return redirect('post_detail', post_id=post_id)
+
