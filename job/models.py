@@ -2,11 +2,16 @@ from django.db import models
 from employ.models import Postable
 
 # Create your models here.
-class Job_post(Postable,models.Model):
+class Job_post(Postable):
     image = models.ImageField(upload_to='post/job/')
-    # userable = models.ForeignKey('account.Userable', on_delete=models.CASCADE)
+    # 회사, 평점 추가
+    employer = models.ForeignKey('account.Employer', on_delete=models.SET_NULL, null=True)
+    STARS = [
+        (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)
+    ]
+    rating = models.IntegerField(choices=STARS, null=True)
 
-class Freepost(Postable,models.Model):
+class Freepost(Postable):
     pass
 
 class report(models.Model):
