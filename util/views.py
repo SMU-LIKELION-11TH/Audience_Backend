@@ -1,116 +1,108 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy #리버스 오류나면 리버스레이지로
 from django.http import JsonResponse
+import json
 
-from .models import Like, Dislike, Interest, Hashtag
+from .models import Like, Dislike, Interest, UserInterest, Hashtag, Rating, EmployerRating
 from employ.models import Postable
 from job.models import Job_post
 
 # 좋아요 tested
-def add_like(request, post_id):
+# ajax로 받기, load 받기
+# filter(), exists()로 확인하는 방법이 더 바람직
+def add_like(request):
+    data = json.loads(request.body)
     user = request.user
+    post_id = data['post_id']
     post = Postable.objects.get(id=post_id)
 
-    like, created = Like.objects.get_or_create(userable=user, postable=post)
+    is_liked = Like.objects.filter(userable=user, postable=post).exists()
+    is_disliked = Dislike.objects.filter(userable=user, postable=post).exists()
 
-    # 좋아요 있으면
-    if not created:
-        # 좋아요 취소
-        like.delete()
-        likes_count = Like.objects.filter(postable=post).count()
-        dislikes_count = Dislike.objects.filter(postable=post).count()
-        return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
-                             'is_liked': False, 'is_disliked': False})
-
-    # 싫어요 있으면
-    try:
-        dislike = Dislike.objects.get(userable=user, postable=post)
-        # 싫어요 취소
-        dislike.delete()
-    except Dislike.DoesNotExist:
-        pass
-
-    likes_count = Like.objects.filter(postable=post).count()
-    dislikes_count = Dislike.objects.filter(postable=post).count()
-    return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
-                         'is_liked': True, 'is_disliked': False})
-
-
-def add_dislike(request, post_id):
-    user = request.user
-    post = Postable.objects.get(id=post_id)
-
-    dislike, created = Dislike.objects.get_or_create(userable=user, postable=post)
-
-    # 싫어요 있으면
-    if not created:
-        # 싫어요 취소
-        dislike.delete()
-        likes_count = Like.objects.filter(postable=post).count()
-        dislikes_count = Dislike.objects.filter(postable=post).count()
-        return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
-                             'is_liked': False, 'is_disliked': False})
-
-    # 좋아요 있으면
-    try:
+    if is_liked:
         like = Like.objects.get(userable=user, postable=post)
-        # 좋아요 취소
         like.delete()
-    except Like.DoesNotExist:
-        pass
+    else:
+        like = Like.objects.create(userable=user, postable=post)
+        like.save()
+
+    if is_disliked:
+        dislike = Dislike.objects.get(userable=user, postable=post)
+        dislike.delete()
 
     likes_count = Like.objects.filter(postable=post).count()
     dislikes_count = Dislike.objects.filter(postable=post).count()
+
     return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
-                         'is_liked': False, 'is_disliked': True})
+                         'is_liked': not is_liked, 'is_disliked': False})
+
+
+# 싫어요 tested
+def add_dislike(request):
+    data = json.loads(request.body)
+    user = request.user
+    post_id = data['post_id']
+    post = Postable.objects.get(id=post_id)
+
+    is_liked = Like.objects.filter(userable=user, postable=post).exists()
+    is_disliked = Dislike.objects.filter(userable=user, postable=post).exists()
+
+    if is_disliked:
+        dislike = Dislike.objects.get(userable=user, postable=post)
+        dislike.delete()
+    else:
+        dislike = Dislike.objects.create(userable=user, postable=post)
+        dislike.save()
+
+    if is_liked:
+        like = Like.objects.get(userable=user, postable=post)
+        like.delete()
+
+    likes_count = Like.objects.filter(postable=post).count()
+    dislikes_count = Dislike.objects.filter(postable=post).count()
+
+    return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
+                         'is_liked': False, 'is_disliked': not is_disliked})
 
 # 평점 추가/변경
+# 그냥 함수라고 생각, request 없이 그냥 함수
+# rating 모델 만들기, like랑 비슷하게 만들되, 중간 테이블까지 생성
 # 구인자에 mapping된 postable 수를 저장하는 필드(post_num)를 만들고 rating_sum/post_num으로 평균 rating을 나타낼 수 있을 듯
-def add_rating(request, post_id):
-    if request.method == "POST":
-        post = Job_post.objects.get(id=post_id)
-        original_rating = post.rating
-        new_rating = request.POST.get('new_rating')
-
-        # 평점 추가
-        if new_rating is None:
-            post.employer.rating_sum += original_rating
-            post.employer.post_num += 1
-        # 평점 변경
-        else:
-            post.employer.rating_sum -= original_rating
-            post.employer.rating_sum += new_rating
-
-        post.employer.save()
-        post.save()
-
-    return redirect('add_hashtag', post_id=post_id)
+# Post Create에서 호출
+def add_rating(applicant, employer, rating):
+    if EmployerRating.objects.filter(applicant=applicant, employer=employer).exists():
+        original_rating = EmployerRating.objects.get(applicant=applicant, employer=employer)
+        original_rating.rating = rating
+        original_rating.save()
+    else:
+        new_rating = EmployerRating.objects.create(applicant=applicant, employer=employer, rating=rating)
+        new_rating.save()
 
 # 관심분야 set
-def update_interest(request):
+# 파이썬 함수처럼 만들어서 회원정보 수정에서 호출할 수 있도록 수정
+def update_interest(request, interest_list):
     user = request.user
     # 관심분야 clear
-    user.interest.clear()
+    UserInterest.objects.filter(userable=user).delete()
     # 다시 전부다 연결
-    new_interests = request.POST.getlist('new_interests')
-
-    if new_interests:
-        for interest_id in new_interests:
-            interest = Interest.objects.get(id=interest_id)
-            user.interest.add(interest)
-        return redirect('마이 페이지')
+    if len(interest_list) > 0:
+        for interest in interest_list:
+            new_interest = Interest.objects.get(id=interest)
+            user.interest.add(new_interest)
+        success = True
+        return success
     else:
-        error_message = "하나 이상 선택하세요"
-        return render(request, 'error.html', {'error_message': error_message})
+        success = False
+        return success
 
 
 # 해시태그 생성(게시물 id)
-def add_hashtag(request, post_id):
+# 파이썬 함수처럼 만들기 게시글 생성 및 수정에서 호출할 수 있게
+def add_hashtag(hashtag_list, post_id):
     post = Postable.objects.get(id=post_id)
 
     # 기존 해시태그 삭제
     Hashtag.objects.filter(postable=post_id).delete()
-    hashtag_list = request.POST.getlist('hashtags')
 
     for post_hashtag in hashtag_list:
         # 없으면 추가
