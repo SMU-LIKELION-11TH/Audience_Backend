@@ -1,39 +1,70 @@
 from django.shortcuts import render,redirect
 from .forms import EPostForm,QuestionForm,AnswerForm
-from .models import Postable
-
-
+from .models import Employ_post, Freepost_e
+from account.models import Employer
+from django.http import JsonResponse
+from util.views import add_hashtag
+import json
 
 # 구인 커뮤니티(구인글/자유소통, all/관심분야/경력/신입 url parameter로 구분)
-def employ_list(request,category1,category2):
-    if category1== employ_post: # 구인글 일때
-        #all
-            def get_top_4_posts():
-                top_posts = Postable.objects.order_by('-views')[:4]
-                return top_posts #조회수 많은거 4개
-            posts = Postable.objects.all() # 전체
-            context = {
-                'posts' : posts,
-            }
-            return renderr(request, '', context)
+def employ_list(request):
+    if request.method == 'GET':
+        return render(request,'employ_list.html')
+    elif request.method == 'POST':
+        data = json.loads(request.body)
+        category1 = data["category1"]
+        category2 = data["category2"]
+        page = data["page"]
+        if category1 == "employ_post": # 구인글 일때
+            if category2 == "all" :
+                top_posts = Employ_post.objects.order_by('-views')[:4] # 조회수 많은거 4개
+                posts = Employ_post.objects.all() # 전체
+                print(data)
 
-        #관심분야
-            #조회수 많은거 4개
-            # 전체
-        #경력/신입
-            #조회수 많은거 4개
-            # 전체
-    if category2 == free_post: # 자유소통 일때
-         #all
-            #조회수 많은거 4개
-            # 전체
+                context = {
+                    'result' : data
+                }
+                return JsonResponse(context)
 
+            elif category2 == "interest" :
+                 user = request.user
+                 interests = user.interest.all()
+                 companys = interests.company.filter(title__icontains=’interests’)
+                 top_posts = Employ_post.objects.order_by('-views')[:4]  # 조회수 많은거 4개
+                 posts = Employ_post.objects.all()  # 전체
+                 print(data)
 
-def employ_post_detail(id,_) #게시물 상세(id, 모집공고/Q&A)
+                 context = {
+                     'result': data
+                 }
+                 return JsonResponse(context)
+
+            else : #경력/신입
+                top_posts = Employ_post.objects.order_by('-views')[:4]  # 조회수 많은거 4개
+                posts = Employ_post.objects.all()  # 전체
+                print(data)
+
+                context = {
+                    'result': data
+                }
+                return JsonResponse(context)
+
+        elif category1 == "free_post" : # 자유소통 일때
+            if category2 == "all" :
+                top_posts = Freepost_e.objects.order_by('-views')[:4]  # 조회수 많은거 4개
+                posts = Freepost_e.objects.all()  # 전체
+                print(data)
+
+                context = {
+                    'result': data
+                }
+                return JsonResponse(context)
+
+def employ_post_detail(post_id,category3,category4) :#게시물 상세(id, 모집공고/Q&A)
     #회사
-    if #모집공고 일때
+    if category3 == "recruitment announcement" : #모집공고 일때 (ajax?)
         #구인글
-    if #Q&A일때
+    if category4 == "QnA" : #Q&A일때
         #Q&A list
 
 def create_employ_post(): #구인글 작성
@@ -41,18 +72,18 @@ def create_employ_post(): #구인글 작성
     if request.method == 'POST':
         form = EPostForm(request.POST)
             if form.is_valid():
-                title = form.cleaned_data['title']
-                content = form.cleaned_data['content']
-                post = Postable(title=title, content=content)
-                ...
+
                 post.save()
+                added_hashtag = add_hashtag(tag_names)
                 return redirect('employ_list')
+
             else:
                 form = PostForm()
         return render(request, 'create_employ_post.html')
+        company = Post.objects.filter(title__icontains=’’) #회사 찾기
 
-def update_employ_post(): #구인글 수정
-    #해시태그 저장 함수 utls에서 찾아서 사용
+
+def update_employ_post(): #구인글 수정 #해시태그 저장 함수 utls에서 찾아서 사용
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         form = EPostForm(request.POST, instance=post)
@@ -69,11 +100,22 @@ def delete_employ_post(): #구인글 삭제
     return redirect('employ_post_detail')
 
 
-def create_employ_free_post(): #구인/자유소통 작성
-    #해시태그 저장 함수 utls에서 찾아서 사용
+def create_employ_free_post(): #구인/자유소통 작성 #해시태그 저장 함수 utls에서 찾아서 사용
+    if request.method == 'POST':
+        form = FreePostForm_e(request.POST)
+            if form.is_valid():
+
+                post.save()
+                added_hashtag = add_hashtag(tag_names)
+                return redirect('employ_list')
+
+            else:
+                form = FreePostForm_e()
+        return render(request, 'create_employ_post.html')
 
 def update_employ_free_post():#구인/자유소통 수정
     #해시태그 저장 함수 utls에서 찾아서 사용
+
 
 def delete_employ_free_post():#구인/자유소통 삭제
 

@@ -1,13 +1,17 @@
 from django import forms
+from .models import Job_post, Report
 
-class JPostForm(forms.Form) :
-    title = forms.CharField(label='Title')
-    content = forms.CharField(label='Content', widget=forms.Textarea)
-    apply_condition =forms.
-    회사이름검색하기
-    평점
-    image = forms.ImageField()
-    해시태그
+class JPostForm(forms.ModelForm) :
+    class Meta:
+        model = Job_post
+        fields = ['title', ' apply_condition', 'content ', 'search_company', 'rating',
+                  'image ', #'hashtag ']
+class FreePostForm_j(forms.ModelForm):
+    class Meta :
+        model = Freepost_j
+        fields =['title', 'image', 'content', #'hashtag']
 
-class ReportForm(forms.Form):
-    content
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = Report
+        fields = ['content ']

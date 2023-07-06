@@ -7,7 +7,7 @@ class Postable(models.Model):
     views = models.IntegerField()
     # userable = models.ForeignKey('account.Userable', on_delete=models.CASCADE)
 
-class Employ_post(Postable,models.Model):
+class Employ_post(Postable):
     required_num = models.IntegerField()
     start_date = models.DateTimeField(max_length=20)
     end_date = models.DateTimeField(max_length=20)
@@ -19,13 +19,17 @@ class Employ_post(Postable,models.Model):
     employ_shape =  models.CharField(max_length=1, default='a', choices=EMPLOY_SHAPE_CHOICES )
     apply_method = forms.CharField(max_length=50)
 
+class Freepost_e (Postable,models.Model):
+    pass
+
+
 class Question(Postable,models.Model):
     employ_post_ref = models.ForeignKey(Employ_post, on_delete=models.CASCADE)
-    # userable = models.ForeignKey('account.Userable', on_delete=models.CASCADE)
+
 
 class Answer(Postable, models.Model):
     progress = models.CharField(max_length=10)
     question_ref = models.ForeignKey(Question, on_delete=models.CASCADE)
-    # userable = models.ForeignKey('account.Userable', on_delete=models.CASCADE)
+
 
 

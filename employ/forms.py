@@ -1,26 +1,24 @@
 from django import forms
+from .models import Employ_post, Freepost_e, Question, Answer
 
-class EPostForm(forms.Form):
-    title = forms.CharField(label='Title')
-    image = forms.ImageField()
-    content = forms.CharField(label='Content', widget=forms.Textarea)
-    employ_shape = forms.
-    career= forms.
-    required_num =forms.IntegerField()
-    prefer_condition =forms.CharField(label='Prefer_condition')
-    apply_method = forms.CharField()
-    start_date = forms.DateTimeField()
-    end_date = forms.DateTimeField()
-    hashtag = forms.CharField()
+class EPostForm(forms,ModelForm):
+    class Meta:
+        model = Employ_post
+        fields = ['title',' image', 'content ', 'employ_shape ', 'career',
+                  'required_num ', 'prefer_condition ', '  apply_method ',
+                  'start_date ','end_date', 'hashtag ']
 
-class QuestionForm(forms.Form):
-    title = forms.CharField(label='Title')
-    content = forms.CharField(label='Content', widget=forms.Textarea)
+class FreePostForm_e(forms.ModelForm):
+    class Meta :
+        model = Freepost_e
+        fields =['title', 'image', 'content', 'hashtag']
 
-class AnswerForm(forms.Form):
-    title = forms.CharField(label='Title')
-    content = forms.CharField(label='Content', widget=forms.Textarea)
-    progress = forms.CharField()
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields=['title','content ']
 
-
-
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields=['title','content ','progress']
