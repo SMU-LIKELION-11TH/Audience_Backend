@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse, reverse_lazy #리버스 오류나면 리버스레이지로
 from django.http import JsonResponse
 import json
 
@@ -35,7 +34,6 @@ def add_like(request):
 
     return JsonResponse({'likes_count': likes_count, 'dislikes_count': dislikes_count,
                          'is_liked': not is_liked, 'is_disliked': False})
-
 
 # 싫어요 tested
 def add_dislike(request):
@@ -95,12 +93,10 @@ def update_interest(request, interest_list):
         success = False
         return success
 
-
 # 해시태그 생성(게시물 id)
 # 파이썬 함수처럼 만들기 게시글 생성 및 수정에서 호출할 수 있게
 def add_hashtag(hashtag_list, post_id):
     post = Postable.objects.get(id=post_id)
-
     # 기존 해시태그 삭제
     Hashtag.objects.filter(postable=post_id).delete()
 
@@ -109,6 +105,4 @@ def add_hashtag(hashtag_list, post_id):
         hashtag, created = Hashtag.objects.get_or_create(name=post_hashtag)
         # 게시물이랑 연결
         hashtag.postable.add(post)
-
-    return redirect('post_detail', post_id=post_id)
-
+        hashtag.save()
