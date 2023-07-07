@@ -169,7 +169,7 @@ class AccountUpdateView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         # update_interest 호출
-        update_interest(self.request, 'interest')
+        update_interest(self.request, 'interests')
         return super().form_valid(form)
 
     def form_invalid(self, form):
@@ -177,7 +177,7 @@ class AccountUpdateView(LoginRequiredMixin, UpdateView):
 
 # 계정 삭제
 @login_required
-def delete_user(request):
+def delete_account(request):
     if request.method == 'POST':
         if request.POST.get('password') == request.user.password:
             request.user.delete()
