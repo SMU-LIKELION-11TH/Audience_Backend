@@ -4,7 +4,7 @@ class Postable(models.Model):
     title = models.CharField(max_length=100)
     content = models.CharField(max_length=1000)
     created_at = models.DateTimeField(auto_now_add=True)
-    views = models.IntegerField()
+    views = models.IntegerField(default = 0)
     userable = models.ForeignKey('account.Userable', on_delete=models.CASCADE, null=True)
 
 class Employ_post(Postable):
@@ -24,11 +24,14 @@ class Freepost_e (Postable,models.Model):
 
 
 class Question(Postable):
+    progress = models.CharField(max_length=100)
     employ_post_ref = models.ForeignKey(Employ_post, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to = "post/question")
 
 
 class Answer(Postable):
-    progress = models.CharField(max_length=10)
+    image = models.ImageField(upload_to = "post/answer")
+
     question_ref = models.ForeignKey(Question, on_delete=models.CASCADE)
 
 

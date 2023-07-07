@@ -18,7 +18,6 @@ class Freepost(Postable):
     pass
 
 class report(models.Model):
-    CONTENT_CHOICES = (('a','사기/도배'),('b','욕설/비하'))
-    content = models.CharField(max_length=1, default='a', choices=CONTENT_CHOICES)
+    content = models.CharField(max_length=100)
     postable = models.ForeignKey('employ.Postable', on_delete=models.CASCADE)
 
