@@ -74,7 +74,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'audience',
         'USER': 'root',
-        'PASSWORD': 'qortmddn',
+        'PASSWORD': 'qortmddn',     # 백승우 영어로
         'HOST': 'audience.ccil2xcrid7z.ap-southeast-2.rds.amazonaws.com',
         'PORT': '3306',
     }
