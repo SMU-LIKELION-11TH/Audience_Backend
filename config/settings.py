@@ -68,13 +68,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# RDS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'audience_db',
+        'NAME': 'audience',
         'USER': 'root',
-        'PASSWORD': 'qortmddn1',
-        'HOST': 'localhost',
+        'PASSWORD': 'qortmddn',
+        'HOST': 'audience.ccil2xcrid7z.ap-southeast-2.rds.amazonaws.com',
         'PORT': '3306',
     }
 }
