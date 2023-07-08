@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from account.models import Employer
 from employ.models import Postable, Employ_post
 from util.models import Hashtag, Interest, UserInterest
-from job.models import Job_post, Freepost
+from job.models import Job_post, Freepost_j
 import json
 from django.db.models import Q
 
