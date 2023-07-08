@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='job_post',
             name='employer',
-            field=models.ForeignKey(default='알 수 없음', on_delete=django.db.models.deletion.SET_DEFAULT, to='account.employer'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_DEFAULT, to='account.employer'),
         ),
         migrations.AddField(
             model_name='job_post',
