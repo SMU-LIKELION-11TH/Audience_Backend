@@ -17,7 +17,7 @@ from .forms import ApplicantCreateForm, EmployerCreateForm, ApplicantUpdateForm,
 
 # 로그인
 class UserLoginView(View):
-    template_name = 'account_detail.html'
+    template_name = 'login.html'
 
     def get(self, request):
         return render(request, self.template_name)
@@ -41,7 +41,7 @@ class UserLoginView(View):
 # 구직자
 class ApplicantCreateView(CreateView):
     model = Applicant
-    template_name = 'account_detail.html'
+    template_name = 'create_applicant.html'
     form_class = ApplicantCreateForm
 
     def get_success_url(self):
@@ -50,7 +50,7 @@ class ApplicantCreateView(CreateView):
 # 구인자
 class EmployerCreateView(CreateView):
     model = Employer
-    template_name = 'account_detail.html'
+    template_name = 'create_employer.html'
     form_class = EmployerCreateForm
 
     def get_success_url(self):
@@ -59,9 +59,9 @@ class EmployerCreateView(CreateView):
 # 회원가입 완료 view
 def signup_finish(request):
     if request.method == "GET":
-        redirect('signup_finish')
+        render(request, 'signup_finish.html')
     else:
-        redirect('login_view')
+        redirect('account_login')
 
 # 아이디 찾기 tested
 def search_username(request):  # ajax로 받기 (done)
@@ -107,6 +107,10 @@ def search_password(request):  # ajax로 변경(done)
 
 # 마이페이지
 @login_required
+def my_page(request):
+    return render(request, 'my_page.html')
+
+@login_required
 def account_detail(request):    # ajax로 받기
     if request.user.is_authenticated:
         return JsonResponse({'user': request.user})
@@ -130,11 +134,11 @@ def check_password(request):
 
     if request.method == "POST":
         if request.POST.password == user.password:
-            return render(request, '개인 정보 수정 템플릿')
+            return redirect('update_account')
         else:
             return redirect('check_password')
     else:
-        return redirect('check_password')
+        return render(request, 'check_password.html')
 
 # 비면번호 변경
 # render 사용해서 틀렸을 때 context에 error(key값으로 두 개) 넣어서 같은 페이지로 이동 (done)
@@ -147,17 +151,17 @@ def change_password(request):
             user.password = new_password
             user.save()
 
-            return redirect('account_update')
+            return redirect('update_account')
         else:
-            return render(request, '비밀번호 변경 템플릿', {'error': '비밀번호 틀림'})
+            return render(request, 'update_password.html', {'error': '비밀번호 틀림'})
     else:
-        return render(request, 'account_update')
+        return render(request, 'update_password.html')
 
 
 # 개인정보 수정
 
 class AccountUpdateView(LoginRequiredMixin, UpdateView):
-    template_name = '업데이트 템플릿'
+    template_name = 'update_account.html'
     success_url = reverse_lazy('account_detail')
 
     def get_form_class(self):
@@ -181,9 +185,9 @@ def delete_account(request):
     if request.method == 'POST':
         if request.POST.get('password') == request.user.password:
             request.user.delete()
-            return redirect('login_view')
+            return redirect('account_login')
         else:
-            return render(request, '계정 삭제 템플릿', {'error': '비밀번호가 일치하지 않습니다.'})
+            return render(request, 'delete_account.html', {'error': '비밀번호가 일치하지 않습니다.'})
     else:
-        return render(request, '계정 삭제 템플릿')
+        return render(request, 'delete_account.html')
 
