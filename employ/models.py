@@ -19,8 +19,8 @@ class Employ_post(Postable):
     employ_shape = models.CharField(max_length=1, default='a', choices=EMPLOY_SHAPE_CHOICES )
     apply_method = models.CharField(max_length=50)
 
-class Freepost_e (Postable,models.Model):
-    pass
+class Freepost_e (Postable):
+    image = models.ImageField(upload_to="free_post_e")
 
 
 class Question(Postable):

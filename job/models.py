@@ -4,7 +4,6 @@ from employ.models import Postable
 # Create your models here.
 class Job_post(Postable):
     image = models.ImageField(upload_to='post/job/')
-    # 회사, 평점 추가
 
     employer = models.ForeignKey('account.Employer', on_delete=models.SET_NULL, null=True)
 
@@ -14,8 +13,9 @@ class Job_post(Postable):
     rating = models.IntegerField(choices=STARS, null=True)
     search_company = models.CharField(max_length=20)
 
-class Freepost(Postable):
-    pass
+
+class Freepost_j(Postable):
+    image = models.ImageField(upload_to = "free_post_j")
 
 class report(models.Model):
     content = models.CharField(max_length=100)
