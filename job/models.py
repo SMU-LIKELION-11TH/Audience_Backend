@@ -5,8 +5,6 @@ from employ.models import Postable
 class Job_post(Postable):
     image = models.ImageField(upload_to='post/job/')
 
-    employer = models.ForeignKey('account.Employer', on_delete=models.SET_NULL, null=True)
-
     STARS = [
         (1, 1), (2, 2), (3, 3), (4, 4), (5, 5)
     ]

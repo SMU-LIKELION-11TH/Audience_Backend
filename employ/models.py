@@ -20,7 +20,7 @@ class Employ_post(Postable):
     apply_method = models.CharField(max_length=50)
 
 class Freepost_e (Postable):
-    image = models.ImageField(upload_to="free_post_e")
+    image = models.ImageField(upload_to="post/free_post_e")
 
 
 class Question(Postable):

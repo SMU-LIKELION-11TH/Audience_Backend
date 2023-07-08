@@ -1,5 +1,5 @@
-from django.shortcuts import render,redirect
-from .forms import QuestionForm, AnswerForm, FreePostForm_e
+from django.shortcuts import render,redirect, get_object_or_404
+from .forms import QuestionForm, AnswerForm, FreePostForm_e, EPostForm
 from .models import Employ_post, Freepost_e, Question, Postable
 from job.models import report
 from account.models import Employer
@@ -47,13 +47,14 @@ def create_employ_post(request):  # 구인글 작성
 
 
 def update_employ_post(request,id): #구인글 수정 #해시태그 저장 함수 utls에서 찾아서 사용
-    post = get_object_or_404(Postable, id=id)
+    post = get_object_or_404(Employ_post, id=id)
     if request.method == 'POST':
-        form = EPostForm(request.POST, request.FILES)
+        form = EPostForm(request.POST, request.FILES,instance = post)
         if form.is_valid():
             form.save()
-            return redirect('employ_post_detail',post.id,"recruitment")
+            return redirect('employ_post_detail',id,"recruitment")
         else:
+            print(form.errors)
             return render(request, 'create_employ_post.html')
 
     else:
@@ -78,11 +79,13 @@ def employ_free_post_detail(request,post_id):
         "dislikes": dislikes
     }
     return render(request, "employ_list.html", context)
+
 def create_employ_free_post(request): #구직/자유소통 작성 #해시태그 저장 함수 utls에서 찾아서 사용
     if request.method == 'POST':
         form = FreePostForm_e(request.POST, request.FILES)
         if form.is_valid():
             post = form.save()
+            post.userable = request.user
             # 해시태그들을 list로 바꾸기
             add_hashtag(tag_names)
 
@@ -96,16 +99,16 @@ def update_employ_free_post(request,id): #구직/자유소통 수정
     #해시태그 저장 함수 utls에서 찾아서 사용
     post = get_object_or_404(Postable, id=id)
     if request.method == 'POST':
-        form = FreePostForm_e(request.POST, request.FILES)
+        form = FreePostForm_e(request.POST, request.FILES,instance = post)
         if form.is_valid():
             form.save()
-            return redirect('employ_free_post_detail',post.id)
+            return redirect('employ_free_post_detail',id)
         else:
             return render(request, 'create_employ_free_post.html')
 
     else:
         return render(request, 'create_employ_free_post.html')
-#
+
 def delete_employ_free_post(request,id): #구직/자유소통 삭제
     post = get_object_or_404(Postable, id=id)
     post.delete()
@@ -144,7 +147,7 @@ def create_question(request,post_id):  # Q&A 질문 작성(게시물 id)
     else:
         return render(request, 'create_question.html')
 
-def delete_question(question_id):  # Q&A 질문 삭제(질문 id)
+def delete_question(request,question_id):  # Q&A 질문 삭제(질문 id)
     question = get_object_or_404(Question, id=question_id)
     question.delete()
     return redirect('QA_list')
@@ -178,7 +181,7 @@ def create_answer(request, post_id,question_id):  # Q&A 답변 작성(질문 id)
     else:
         return render(request, 'create_answer.html')
 
-def delete_answer(answer_id): #Q&A 답변 삭제?(답변 id)
+def delete_answer(request,answer_id): #Q&A 답변 삭제?(답변 id)
     answer = get_object_or_404(Answer, id = answer_id)
     answer.delete()
     return redirect('question_detail')

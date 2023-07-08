@@ -3,7 +3,6 @@ from . import views as views
 
 
 urlpatterns = [
-    # path('list/',views.job_list,name='job_list'),
     path('<int:post_id>/', views.job_post_detail, name='job_post_detail'),
     path('create/', views.create_job_post, name='create_job_post'),
     path('update/<int:id>/',views.update_job_post,name='update_job_post'),
@@ -13,6 +12,6 @@ urlpatterns = [
     path('freepost/update/<int:id>/', views.update_job_free_post, name='update_job_free_post'),
     path('freepost/delete/<int:id>/', views.delete_job_free_post, name='delete_job_free_post'),
     path("report/create/", views.report_create_j, name="report_create_j"),
-
+    path("company/search/", views.search_company, name="search_company"),
 
 ]
