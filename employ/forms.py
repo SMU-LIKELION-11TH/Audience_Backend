@@ -8,11 +8,12 @@ class EPostForm(forms.ModelForm):
                   'required_num', 'prefer_condition', 'apply_method',
                   'start_date','end_date']
 #
-# class FreePostForm_e(forms.ModelForm):
-#     class Meta :
-#         model = Freepost_e
-#         fields =['title', 'image', 'content', 'hashtag']
-#
+
+class FreePostForm_e(forms.ModelForm):
+    class Meta :
+        model = Freepost_e
+        fields =['title', 'image', 'content']
+
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
