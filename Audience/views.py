@@ -17,8 +17,8 @@ def main_view(request):
 
 # 검색페이지(검색어 get parameter)
 # 뷰만 띄움
-def search_page(request, category):
-    return render(request, '검색 화면 템플릿')
+def search_page(request, keyword, category, board_type, post_type, search_type):
+    return render(request, 'main_view.html')
 
 # 검색 결과
 # 매개변수로 검색어랑 카테고리 pk로 받아서 검색
@@ -115,5 +115,4 @@ def search_posts(request):
             elif search_type == "회사":
                 posts = Freepost.objects.filter(company__incontain=keyword)
 
-    return JsonResponse({'posts': posts, 'category': category, 'board_type': board_type,
-                         'post_type': post_type, 'search_type': search_type, 'keyword': keyword})
+    return JsonResponse({'posts': posts})
