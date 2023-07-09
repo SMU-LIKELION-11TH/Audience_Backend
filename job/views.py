@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import JPostForm,ReportForm, FreePostForm_j
+from .forms import JPostForm, FreePostForm_j
 from .models import Job_post, Freepost_j
 from account.models import Employer
 from util.views import add_hashtag, add_rating
@@ -120,7 +120,7 @@ def search_company(request):
     if request.method == "POST":
         data = json.loads(request.body)
         name = data["name"]
-        companies = list(Employer.objects.filter(name__contains = name).values())
+        companies = list(Employer.objects.filter(name__contains = name).values("name"))
         context = {
             "companies" : companies
         }
