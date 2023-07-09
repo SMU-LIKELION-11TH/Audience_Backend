@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy  # 리버스 오류나면 리버스레이지로
 from django.http import JsonResponse
 import json
-
+from django.core import serializers
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
@@ -67,15 +67,15 @@ def signup_finish(request):
 def search_username(request):  # ajax로 받기 (done)
     data = json.loads(request.body)
     email = data['email']
-    nickname = data['nickname']
+    name = data['name']
 
     # 성공
-    if Userable.objects.get(email=email, nickname=nickname).exists():
-        username = Userable.objects.get(email=email, nickname=nickname).username
-        return JsonResponse({'success': True, 'username': username, 'nickname': nickname, 'email': email})
+    if Userable.objects.filter(name=name).exists():
+        username = Userable.objects.get(name=name).username
+        return JsonResponse({'success': True, 'username': username, 'name': name})
     # 실패
     else:
-        return JsonResponse({'success': False, 'error': f'"{email}", "{nickname}" does not exist.'})
+        return JsonResponse({'success': False, 'error': f' "{name}" does not exist.'})
 
 
 # 아이디/비밀번호 찾기 창 view 만들기
@@ -96,10 +96,10 @@ def search_password(request):  # ajax로 변경(done)
         send_mail(
             f'임시 비밀번호: {new_password}',
             'from@naver.com',  # 임시 계정 만들기
-            [user.email],
+            [user.username],
             fail_silently=False,
         )
-        return JsonResponse({'success': True, 'username': username})
+        return JsonResponse({'success': True})
     # 실패
     else:
         return JsonResponse({'success': False, 'error': f'"{username}" does not exist.'})
@@ -113,25 +113,30 @@ def my_page(request):
 @login_required
 def account_detail(request):    # ajax로 받기
     if request.user.is_authenticated:
-        return JsonResponse({'user': request.user})
+
+        user = Userable.objects.filter(id = request.user.id)
+        return JsonResponse({"user" : user.values()[0]})
 
 @login_required
 def my_posts(request):
     if request.user.is_authenticated:
-        posts = Postable.objects.order_by('-created_at')[:5]
-        return JsonResponse({'post': posts})
+        user = request.user
+        posts = Postable.objects.filter(userable = user).order_by('-created_at')[:5]
+        return JsonResponse({'post': list(posts.values())})
 
 @login_required
 def my_posts_detail(request):
     if request.user.is_authenticated:
-        posts = Postable.objects.all()
-        return JsonResponse({'post': posts})
+        user = request.user
+        data = json.loads(request.body)
+        page_num = data["page_num"]
+        posts = Postable.objects.filter(userable = user)[5*(page_num-1):5*page_num-1]
+        return JsonResponse({'post': list(posts.values())})
 
 # 비밀번호 확인
-@login_required
+# @login_required
 def check_password(request):
     user = request.user
-
     if request.method == "POST":
         if request.POST.password == user.password:
             return redirect('update_account')

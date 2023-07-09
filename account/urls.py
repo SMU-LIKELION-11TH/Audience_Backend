@@ -13,6 +13,6 @@ urlpatterns = [
     path('update/', views.AccountUpdateView.as_view(), name='update_account'),
     path('delete/', views.delete_account, name='delete_account'),
     path('posts/', views.my_posts, name='my_posts'),
-    path('posts/detail', views.my_posts_detail, name='my_posts_detail'),
+    path('posts/detail/', views.my_posts_detail, name='my_posts_detail'),
     path('signup/finish/', views.signup_finish, name='signup_finish'),
 ]
