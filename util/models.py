@@ -13,7 +13,7 @@ class Interest(models.Model):
 
 class UserInterest(models.Model):
     interest = models.ForeignKey("util.Interest", on_delete=models.CASCADE, null=True)
-    userable = models.ForeignKey("account.Userable", on_delete=models.CASCADE, null=True)
+    userable = models.ForeignKey("account.Userable", on_delete=models.CASCADE, null=True, related_name = "interest")
 
 class Hashtag(models.Model):
     name = models.CharField(max_length=10, null=False, default='')
