@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import json
-
+from account.models import Userable
 from .models import Like, Dislike, Interest, UserInterest, Hashtag, Rating, EmployerRating
 from employ.models import Postable
 from job.models import Job_post
@@ -12,7 +12,7 @@ from job.models import Job_post
 def add_like(request):
     data = json.loads(request.body)
     user = request.user
-    post_id = data['post_id']
+    post_id = int(data['post_id'])
     post = Postable.objects.get(id=post_id)
 
     is_liked = Like.objects.filter(userable=user, postable=post).exists()
@@ -38,8 +38,10 @@ def add_like(request):
 # 싫어요 tested
 def add_dislike(request):
     data = json.loads(request.body)
-    user = request.user
-    post_id = data['post_id']
+    # user = request.user
+    user = Userable.objects.get(id = 3)
+
+    post_id = int(data['post_id'])
     post = Postable.objects.get(id=post_id)
 
     is_liked = Like.objects.filter(userable=user, postable=post).exists()
