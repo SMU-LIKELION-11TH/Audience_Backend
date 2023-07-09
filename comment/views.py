@@ -1,6 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import Comment, Reply
+from account.models import Userable
 from employ.models import Postable
 import json
 from django.http import JsonResponse
@@ -9,11 +10,12 @@ from django.http import JsonResponse
 def create_comment(request): # 댓글 생성(ajax)
     if request.method == 'POST':
         user = request.user
+
         data = json.loads(request.body)
         post = Postable.objects.get(id = data['post_id'])
         content = data['content']
 
-        Comment.objects.create(content = content, postable = post, userable = request.user)
+        Comment.objects.create(content = content, postable = post, userable = user)
 
         return JsonResponse({})
 
